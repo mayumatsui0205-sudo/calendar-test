@@ -1,0 +1,563 @@
+/* =========================
+   theme.css (shared)
+   - 見た目テーマのみ（レイアウトはしない）
+========================= */
+
+/* フォント：Webフォント（日本語ドット） */
+@font-face {
+    font-family: "PixelMplus";
+    src: url("../fonts/AnyConv.com__BestTen-DOT.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* HTML / BODY 基本 */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: "PixelMplus", monospace;
+    color: #ffffff;
+    image-rendering: pixelated;
+
+    font-size: 12px;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+
+    /* テーマ変数（デフォルト） */
+    --bg-0: #0b1d39;
+    --bg-1: #081a33;
+    --text-0: #ffffff;
+
+    --ui-0: #4fc3f7;
+    --ui-rgb: 79, 195, 247;
+    --ui-1: rgba(79, 195, 247, 0.22);
+
+    --dot-color: #4fc3f7;
+    --noise-0: rgba(255, 255, 255, 0.035);
+}
+
+body {
+    background: var(--bg-0);
+    color: var(--text-0);
+}
+
+/* 全要素のサイズ計算統一（全ページで安定） */
+* {
+    box-sizing: border-box;
+}
+
+/* スクロールバー（Chrome系） */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #081a33;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ui-0);
+}
+
+/* =========================
+   背景ドット + 空気感（全ページ共通）
+========================= */
+@keyframes bgScroll {
+    from {
+        background-position: 0 0, 8px 8px;
+    }
+
+    to {
+        background-position: 0 256px, 8px 264px;
+    }
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background-image:
+        radial-gradient(var(--dot-color) 1px, transparent 1px),
+        radial-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px);
+
+    background-size: 16px 16px, 32px 32px;
+    background-position: 0 0, 8px 8px;
+
+    opacity: 0.25;
+    animation: bgScroll 60s linear infinite;
+}
+
+@keyframes starDrift {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(220px);
+    }
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        opacity: 0.22;
+    }
+
+    50% {
+        opacity: 0.35;
+    }
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+
+    background-image:
+        radial-gradient(circle at 30% 20%, var(--ui-1), transparent 55%),
+        radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
+        radial-gradient(var(--noise-0) 1px, transparent 1px);
+
+    background-size: 100% 100%, 22px 22px, 18px 18px;
+    background-position: 0 0, 0 0, 0 0;
+
+    opacity: 0.28;
+    animation: glowPulse 6s ease-in-out infinite, starDrift 90s linear infinite;
+}
+
+/* =========================
+   タイトル演出（任意）
+========================= */
+@keyframes questBlink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.35;
+    }
+}
+
+@keyframes questFloat {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-2px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.quest-title {
+    position: relative;
+    display: inline-block;
+    animation: questBlink 1.2s steps(1) infinite, questFloat 2.4s ease-in-out infinite;
+}
+
+/* =========================
+   時間帯テーマ（JSで body に付与）
+========================= */
+body.morning {
+    --dot-color: #7dd3fc;
+    --bg-0: #061a2f;
+    --bg-1: #062444;
+    --ui-0: #7dd3fc;
+    --ui-rgb: 125, 211, 252;
+    --ui-1: rgba(125, 211, 252, 0.22);
+    --noise-0: rgba(255, 255, 255, 0.030);
+}
+
+body.day {
+    --dot-color: rgba(255, 235, 59, 0.9);
+    --bg-0: #071a2b;
+    --bg-1: #0a2a3d;
+    --ui-0: #ffe45c;
+    --ui-rgb: 255, 228, 92;
+    --ui-1: rgba(255, 228, 92, 0.18);
+    --noise-0: rgba(255, 255, 255, 0.028);
+}
+
+body.evening {
+    --dot-color: rgba(255, 167, 38, 0.85);
+    --bg-0: #0d1026;
+    --bg-1: #13113a;
+    --ui-0: #ff9f43;
+    --ui-rgb: 255, 159, 67;
+    --ui-1: rgba(255, 159, 67, 0.18);
+    --noise-0: rgba(255, 255, 255, 0.026);
+}
+
+body.night {
+    --dot-color: rgba(148, 163, 184, 0.4);
+    --bg-0: #050812;
+    --bg-1: #070a18;
+    --ui-0: #93c5fd;
+    --ui-rgb: 147, 197, 253;
+    --ui-1: rgba(147, 197, 253, 0.16);
+    --noise-0: rgba(255, 255, 255, 0.020);
+}
+
+/* =========================
+   共通の色上書き（存在する要素だけに効く）
+========================= */
+.header {
+    background: var(--bg-1);
+    border-bottom-color: var(--ui-0);
+}
+
+.nav a:hover {
+    color: var(--ui-0);
+}
+
+.card {
+    border-color: var(--ui-0);
+}
+
+.calendar {
+    border-color: var(--ui-0);
+    background: var(--bg-1);
+}
+
+.date-cell {
+    border-color: var(--ui-0);
+}
+
+/* ★曜日セルの .day と body.day の衝突回避 */
+.calendar-week .day {
+    color: var(--ui-0);
+}
+
+/* =========================
+   Sidebar（テーマ追従 + 可読性）
+========================= */
+.sidebar {
+    background: var(--ui-0) !important;
+    /* calendarevent.css の青に勝つ */
+    border-right: 4px solid rgba(var(--ui-rgb), 0.65);
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.25);
+}
+
+/* 昼/朝は暗文字、それ以外は白 */
+body.day .sidebar,
+body.day .sidebar a,
+body.morning .sidebar,
+body.morning .sidebar a {
+    color: #0b1020;
+}
+
+body.evening .sidebar,
+body.evening .sidebar a,
+body.night .sidebar,
+body.night .sidebar a {
+    color: #ffffff;
+}
+
+.sidebar a {
+    display: inline-block;
+    padding: 6px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: transform 120ms ease, filter 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.sidebar a:hover {
+    background: rgba(0, 0, 0, 0.18);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25);
+    transform: translateY(-1px);
+}
+
+.sidebar a:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+}
+
+/* =========================
+   Buttons（テーマ追従）
+========================= */
+button,
+.create-btn,
+.create {
+    background: var(--ui-0) !important;
+    color: #0b1020;
+    border-color: #ffffff;
+}
+
+body.evening button,
+body.evening .create-btn,
+body.evening .create,
+body.night button,
+body.night .create-btn,
+body.night .create {
+    color: #ffffff;
+}
+
+button,
+.create-btn {
+    transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
+}
+
+button:hover,
+.create-btn:hover,
+.create:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+    box-shadow: 0 0 0 2px rgba(var(--ui-rgb), 0.65), 6px 6px 0 #000;
+}
+
+button:active,
+.create-btn:active,
+.create:active {
+    box-shadow: 1px 1px 0 #000;
+    transform: translate(3px, 3px);
+}
+
+/* =========================
+   Inputs（テーマ追従 + 可読性）
+========================= */
+input,
+textarea,
+select {
+    background: #000;
+    color: var(--ui-0);
+    border: 3px solid var(--ui-0);
+    outline: none;
+    caret-color: var(--ui-0);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: rgba(var(--ui-rgb), 0.55);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(var(--ui-rgb), 0.35), 0 0 14px rgba(var(--ui-rgb), 0.20);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+    opacity: 0.65;
+    filter: grayscale(0.15);
+    cursor: not-allowed;
+}
+
+/* ラベルは常に白（フォーム背景が暗い前提） */
+label {
+    color: #ffffff !important;
+}
+
+/* =========================
+   Category tags（テーマ追従）
+========================= */
+.category-tag {
+    --tag-color: var(--ui-0);
+    color: var(--text-0);
+    border-color: var(--tag-color);
+    background: rgba(var(--ui-rgb), 0.16);
+    transition: all 0.15s ease;
+}
+
+.category-tag:hover {
+    background: rgba(var(--ui-rgb), 0.28);
+    transform: translateY(-1px);
+}
+
+.category-tag.active {
+    background: var(--tag-color);
+    color: #0b1020;
+}
+
+body.evening .category-tag.active,
+body.night .category-tag.active {
+    color: #ffffff;
+}
+
+/* ＋追加ボタン：テーマ追従（昼は黒文字で可読性確保） */
+.add-category {
+    border-color: var(--ui-0);
+    color: var(--ui-0);
+    background: transparent;
+    transition: all 0.15s ease;
+}
+
+.add-category:hover {
+    background: rgba(var(--ui-rgb), 0.18);
+}
+
+body.day .add-category {
+    color: #0b1020 !important;
+    border-color: #0b1020 !important;
+    background: rgba(0, 0, 0, 0.08);
+}
+
+body.day .add-category:hover {
+    background: rgba(0, 0, 0, 0.14);
+}
+
+/* =========================
+   File/Color pickers（見え方調整）
+========================= */
+input[type="file"] {
+    color-scheme: dark;
+}
+
+input[type="file"]::file-selector-button {
+    background: var(--ui-0);
+    color: #0b1020;
+    border: 3px solid #ffffff;
+    box-shadow: 4px 4px 0 #000;
+    cursor: pointer;
+}
+
+body.evening input[type="file"]::file-selector-button,
+body.night input[type="file"]::file-selector-button {
+    color: #ffffff;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    background: var(--ui-0);
+    color: #0b1020;
+    border: 3px solid #ffffff;
+    box-shadow: 4px 4px 0 #000;
+    cursor: pointer;
+}
+
+body.evening input[type="file"]::-webkit-file-upload-button,
+body.night input[type="file"]::-webkit-file-upload-button {
+    color: #ffffff;
+}
+
+input[type="color"] {
+    width: 48px;
+    height: 32px;
+    padding: 0;
+    border: 3px solid var(--ui-0);
+    background: #000;
+    cursor: pointer;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 4px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: 2px solid #ffffff;
+    border-radius: 2px;
+}
+
+input[type="color"]::-moz-color-swatch {
+    border: 2px solid #ffffff;
+    border-radius: 2px;
+}
+
+/* =========================
+   Chrome: date/time picker icon visible
+========================= */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+    background: #000;
+    color: var(--ui-0);
+    border: 3px solid var(--ui-0);
+    color-scheme: dark;
+
+    /* もしどこかで appearance を潰していた場合の保険 */
+    -webkit-appearance: auto;
+    appearance: auto;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    opacity: 1 !important;
+    filter: invert(1) brightness(2.2) contrast(1.25) !important;
+    cursor: pointer;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator,
+input[type="time"]:hover::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]:hover::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(2.6) contrast(1.3) !important;
+}
+
+/* =========================
+   UI breathe/flicker（共通）
+========================= */
+@keyframes uiBreathe {
+
+    0%,
+    100% {
+        filter: brightness(1.00);
+    }
+
+    50% {
+        filter: brightness(1.08);
+    }
+}
+
+@keyframes uiFlicker {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    92% {
+        opacity: 1;
+    }
+
+    93% {
+        opacity: 0.55;
+    }
+
+    94% {
+        opacity: 1;
+    }
+
+    97% {
+        opacity: 0.7;
+    }
+
+    98% {
+        opacity: 1;
+    }
+}
+
+body.morning .header,
+body.morning .calendar {
+    animation: uiBreathe 5.5s ease-in-out infinite;
+}
+
+body.day .header,
+body.day .calendar {
+    animation: uiBreathe 4.2s ease-in-out infinite;
+}
+
+body.evening .header,
+body.evening .calendar {
+    animation: uiBreathe 6.8s ease-in-out infinite;
+}
+
+body.night .header,
+body.night .calendar {
+    animation: uiFlicker 10s linear infinite;
+}

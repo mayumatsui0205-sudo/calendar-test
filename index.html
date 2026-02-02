@@ -7,12 +7,14 @@
   <title>声のたまり場 寄り道ラボ</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/theme.css">
+
 </head>
+
 <body>
+  <div id="top"></div>
 
-
-</body>
-<header class="header">
+  <header class="header">
     <div class="logo">声のたまり場 寄り道ラボ</div>
 
     <nav class="nav">
@@ -24,6 +26,107 @@
       <a href="calendarevent.html" class="create-btn">＋ イベント作成</a>
     </div>
   </header>
+
+  <main class="container">
+
+    <section class="top-grid">
+      <div class="card main-card">
+        <h2 class="quest-title">⚔アキバラボクエスト⚔</h2>
+        <div class="next-event">
+          <div class="next-event-label">直近のイベント</div>
+          <div id="nextEventText">読み込み中...</div>
+        </div>
+        <img id="nextEventImage" alt="" style="display:none;">
+      </div>
+
+      <div class="card">
+        <h2>アキバエリア情報</h2>
+        <div>イベント開催中</div>
+      </div>
+    </section>
+
+    <!-- 施設利用ルール -->
+    <section class="facility-rule">
+      <div class="card rule-card">
+        <h2 class="rule-title">🏠 施設利用ルール</h2>
+
+        <ul class="rule-list">
+          <li><span>⏰ 利用時間</span></li>
+          <li>平日：18:00 ～ 21:00</li>
+          <li>土日：9:00 ～ 21:00</li>
+          <li>※ 平日・土日ともに <strong>21:00 まで利用可能</strong></li>
+        </ul>
+
+        <p class="rule-warning">
+          ⚠ <strong>21:45 には完全撤収</strong> をお願いします
+        </p>
+
+        <p class="rule-note">
+          ※ 長時間利用する場合は、周囲へのご配慮をお願いします
+        </p>
+      </div>
+    </section>
+
+    <section class="calendar" id="calendar">
+      <div class="calendar-header">
+        <button id="prev" type="button">&lt;</button>
+        <span id="monthLabel"></span>
+        <button id="next" type="button">&gt;</button>
+      </div>
+
+      <div class="calendar-week">
+        <div class="day">月</div>
+        <div class="day">火</div>
+        <div class="day">水</div>
+        <div class="day">木</div>
+        <div class="day">金</div>
+        <div class="day">土</div>
+        <div class="day">日</div>
+      </div>
+
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </section>
+
+    <!-- イベント一覧ポップアップ（index用） -->
+    <div id="eventPopup" class="popup-overlay">
+      <div class="popup" onclick="event.stopPropagation()">
+        <div class="popup-header">
+          <h3 id="eventPopupTitle">イベント一覧</h3>
+          <button id="eventPopupClose" type="button">閉じる</button>
+        </div>
+        <div id="eventPopupList"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer footer-fixed">
+    <small>
+      © YORIMICHI LAB / Internal Quest Tool ·
+      Font: BestTen FONT (M+ FONTS PROJECT)
+    </small>
+  </footer>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
+  <script src="js/theme.js" defer></script>
+
+  <script defer>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (!window.supabase) {
+        console.error("supabase library not loaded");
+        return;
+      }
+      window.supabaseClient = window.supabase.createClient(
+        "https://edkutwxjjrzqhfephiys.supabase.co",
+        "sb_publishable_OTon5bWCuMDV_Lzcdpe-yg_fQL5o4or"
+      );
+    });
+  </script>
+
+  <script src="js/script.js" defer></script>
+
 </body>
 
 </html>

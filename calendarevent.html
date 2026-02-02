@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>イベント作成</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/calendarevent.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/theme.js" defer></script>
+
+</head>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<body>
+
+  <div class="container">
+
+    <aside class="sidebar">
+      <h3>メニュー</h3>
+      <a href="index.html">← 戻る</a>
+    </aside>
+
+    <main class="main">
+      <h1>イベント作成</h1>
+
+      <div class="form-group">
+        <label>イベント名</label>
+        <input type="text" id="title">
+      </div>
+
+      <div class="form-group">
+        <label>日時</label>
+        <input type="date" id="date">
+      </div>
+
+      <div class="form-group">
+        <label>時間</label>
+        <input type="time" id="time">
+      </div>
+
+      <div class="form-group">
+        <label>タグ</label>
+        <div class="category-area" id="categoryArea">
+          <span class="category-tag" onclick="toggleCategory(this)">勉強会</span>
+          <span class="category-tag" onclick="toggleCategory(this)">ほっと一息</span>
+          <button class="add-category" onclick="openCategoryModal()">＋ タグ追加</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>イベント内容</label>
+        <textarea id="detail" rows="5"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>画像（任意）</label>
+        <input type="file" id="imageFile" accept="image/*">
+      </div>
+
+      <div class="button-area">
+        <button class="create" onclick="save()">作成</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- タグ追加モーダル -->
+  <div class="modal" id="categoryModal" onclick="closeCategoryModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h3>タグ追加</h3>
+
+      <input type="text" id="newCategoryName" placeholder="タグ名">
+
+      <label style="display:block; margin-top:10px;">
+        タグカラー
+        <input type="color" id="newCategoryColor" value="#4fc3f7">
+      </label>
+
+
+      <div class="modal-buttons">
+        <button onclick="createCategory(true)">作成して選択</button>
+        <button onclick="closeCategoryModal()">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!--  DB接続（成功版の内容） -->
+  <script>
+    const SUPABASE_URL = "https://edkutwxjjrzqhfephiys.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_OTon5bWCuMDV_Lzcdpe-yg_fQL5o4or";
+    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  </script>
+
+  <!--  あなたの処理JSも1回だけ -->
+  <script src="js/calendarevent.js"></script>
+</body>
+
+</html>

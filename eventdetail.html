@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>イベント詳細</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <script src="js/theme.js" defer></script>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">イベント詳細</div>
+        <div class="header-right">
+            <a href="index.html" class="create-btn">← 戻る</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h2 id="detailTitle">---</h2>
+
+            <!-- ✅ 一覧モード用 -->
+            <div id="listArea" style="display:none;">
+                <p id="listDate">---</p>
+                <div id="eventList"></div>
+            </div>
+
+            <!-- ✅ 詳細モード用（既存） -->
+            <div id="detailArea" style="display:none;">
+                <p id="detailDate">---</p>
+                <p id="detailCategory">---</p>
+                <p id="detailContent">---</p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const params = new URLSearchParams(location.search);
+        const dateStr = params.get("date"); // YYYY-MM-DD
+        const idx = Number(params.get("idx"));
+
+        const events = JSON.parse(localStorage.getItem("events")) || {};
+
+        // index側は "2026-2-1" キーなので合わせる
+        const key = `${Number(dateStr.split("-")[0])}-${Number(dateStr.split("-")[1])}-${Number(dateStr.split("-")[2])}`;
+        const list = events[key] || [];
+        const e = list[idx];
+
+        if (!e) {
+            document.getElementById("detailTitle").textContent = "イベントが見つかりません";
+        } else {
+            document.getElementById("detailTitle").textContent = e.title || "";
+            document.getElementById("detailDate").textContent = `${dateStr} ${e.time || ""}`;
+            document.getElementById("detailCategory").textContent =
+                `タグ：${(e.category && e.category.length) ? e.category.join(" / ") : "-"}`;
+            document.getElementById("detailContent").textContent = e.detail || "";
+        }
+    </script>
+</body>
+
+</html>
