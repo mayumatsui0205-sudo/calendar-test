@@ -14,7 +14,7 @@
   z-index: 1;
 }
 
-/* スキャンライン（indexだけに掛けたいならここに残す） */
+/* スキャンライン */
 @keyframes scanMove {
   from {
     background-position: 0 0;
@@ -42,7 +42,7 @@
   animation: scanMove 12s linear infinite;
 }
 
-/* ヘッダー（レイアウト部分だけ。色は theme.css 側が上書き） */
+/* ヘッダー */
 .header {
   display: flex;
   justify-content: space-between;
@@ -83,7 +83,7 @@
   margin-bottom: 24px;
 }
 
-/* 直近イベント枠の画像を小さめに */
+/* 直近イベント枠の画像 */
 .next-event img {
   display: block;
   margin-top: 8px;
@@ -94,7 +94,6 @@
   object-fit: cover;
   border: 2px solid var(--ui-0);
 }
-
 
 /* カード */
 .card {
@@ -150,7 +149,7 @@
   gap: 6px;
 }
 
-/* ★ここ重要：曜日セルだけに .day を限定 */
+/* 曜日セルだけ */
 .calendar-week .day {
   text-align: center;
   font-size: 10px;
@@ -164,6 +163,7 @@
   font-size: 10px;
   background: #000;
   overflow-y: auto;
+  cursor: pointer;
 }
 
 .date-num {
@@ -189,23 +189,7 @@
   text-overflow: ellipsis;
 }
 
-.event-title.tag-勉強会 {
-  border-left-color: #4fc3f7;
-}
-
-.event-title.tag-ほっと一息 {
-  border-left-color: #81c784;
-}
-
-.event-title.tag-交流会 {
-  border-left-color: #ffb74d;
-}
-
-.event-title.tag-その他 {
-  border-left-color: #e0e0e0;
-}
-
-/* フォーム/ボタン（indexに存在するものだけ残す） */
+/* フォーム系（indexにある分だけ） */
 label {
   font-size: 12px;
   margin-bottom: 8px;
@@ -264,20 +248,22 @@ button:active {
   color: #ffffff;
 }
 
-.next-event {
-  position: relative;
-  z-index: 2;
-  pointer-events: auto;
-}
-
-/* ポップアップ */
+/* =========================
+   ポップアップ（全画面固定 + 中央表示）
+========================= */
 .popup-overlay {
   display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.65);
+
   align-items: flex-start;
   justify-content: center;
 }
 
-.popup-overlay[style*="display: block"] {
+.popup-overlay.open {
   display: flex;
 }
 
@@ -328,4 +314,230 @@ button:active {
   height: auto;
   object-fit: cover;
   border: 2px solid var(--ui-0);
+}
+
+/* eventdetail.css or style.css */
+#detailImage {
+  max-width: 100%;
+  max-height: 400px;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+  /* ← 全体を収める */
+  display: block;
+  margin: 16px auto;
+  border-radius: 8px;
+}
+
+#detailImage {
+  background: #f3f3f3;
+}
+
+/* =========================
+   カレンダー：タグ色反映
+   JSが --tag-color を設定する前提
+========================= */
+
+/* カレンダーセル内のイベント表示 */
+.event-title {
+  position: relative;
+  padding-left: 10px;
+  /* 色バー分の余白 */
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+/* 左の色バー（タグ色） */
+.event-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 4px;
+  background: var(--tag-color, transparent);
+  border-radius: 2px;
+}
+
+/* ポップアップ一覧側も同じ色バー */
+.event-list-item {
+  position: relative;
+  padding-left: 10px;
+  margin: 6px 0;
+  cursor: pointer;
+}
+
+.event-list-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 4px;
+  background: var(--tag-color, transparent);
+  border-radius: 2px;
+}
+
+/* カレンダー：複数タグの色ドット */
+.event-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.event-title .event-text {
+  flex: 1;
+  min-width: 0;
+  /* 折り返し/省略の崩れ防止 */
+}
+
+.tag-dots {
+  display: inline-flex;
+  gap: 4px;
+  flex-shrink: 0
+}
+
+.tag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dot-color, transparent);
+  border: 1px solid rgba(255, 255, 255, .35)
+}
+
+.event-title {
+  display: flex;
+  align-items: center;
+  gap: 6px
+}
+
+.event-text {
+  flex: 1;
+  min-width: 0
+}
+
+.event-list-item {
+  display: flex;
+  align-items: center;
+  gap: 6px
+}
+
+.tag-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 14px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1;
+  border: 1px solid rgba(255, 255, 255, .35);
+  background: rgba(255, 255, 255, .08);
+  color: #fff;
+  margin-left: 2px;
+}
+
+/* =========================
+   Mobile minimal patch (append-only)
+   既存デザインを壊さず、スマホでの崩れを抑える
+========================= */
+@media (max-width: 640px) {
+
+  /* コンテナ余白を少し詰める（中央寄せは維持） */
+  .container {
+    padding: 12px;
+    /* 既存24pxから上書き */
+  }
+
+  /* ヘッダー：横並びを維持しつつ、折り返し許可 */
+  .header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* ナビ：横幅が足りない時に折り返し */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav a {
+    margin-right: 0;
+    /* 既存の右マージンを無効化してgapに寄せる */
+  }
+
+  /* 作成ボタン：スマホで押しやすい見た目（サイズのみ） */
+  .create-btn {
+    padding: 10px 12px;
+  }
+
+  /* 上段2カラム → 1カラム（ここが崩れの最大要因になりがち） */
+  .top-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* カレンダー：左右の余白を圧縮し、横幅に収める */
+  .calendar {
+    padding: 12px;
+  }
+
+  /* 月ラベル：横幅が狭いときの見切れ対策 */
+  #monthLabel {
+    font-size: 16px;
+    /* 既存18pxから少しだけ */
+    letter-spacing: 0.04em;
+  }
+
+  /* 前後ボタン：タップしやすさ（サイズのみ） */
+  #prev,
+  #next {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* 日付セル：縦が伸びすぎないように最小高さを少し下げる */
+  .date-cell {
+    min-height: 64px;
+    /* 既存80pxから上書き */
+    font-size: 10px;
+    /* 現状維持に近い */
+  }
+
+  /* ポップアップ：スマホで画面外に飛ばないようにする */
+  .popup-overlay {
+    padding: 12px;
+    /* 既存24pxから上書き */
+    align-items: center;
+    /* 上寄せ→中央寄せ（画面外を避ける） */
+  }
+
+  .popup {
+    margin: 0 auto;
+    /* 既存80px auto を上書き */
+    width: 100%;
+    /* 画面幅に合わせる */
+    max-height: 80vh;
+    /* 画面からはみ出したら中をスクロール */
+    overflow: auto;
+  }
+}
+
+/* さらに小さい端末（例: 375px以下）だけ微調整 */
+@media (max-width: 380px) {
+  .logo {
+    font-size: 12px;
+  }
+
+  #monthLabel {
+    font-size: 15px;
+  }
+
+  .event-title {
+    font-size: 8px;
+    /* 既存9pxから1段だけ */
+  }
 }

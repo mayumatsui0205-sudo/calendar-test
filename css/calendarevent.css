@@ -142,6 +142,30 @@ textarea:focus {
   box-shadow: 6px 6px 0 #000;
   padding: 20px;
 
+  max-height: 80vh;
+  overflow: auto;
+
   width: 280px;
   max-width: 90vw;
+  animation: questFloat 1.6s ease-in-out infinite;
+}
+
+/* モーダル中央寄せ */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+
+  /* ✅ 中央ポップアップ */
+  align-items: center;
+  justify-content: center;
+
+  /* ✅ ほか要素より前面 */
+  z-index: 3000;
+}
+
+/* JSが display:flex にするので保険（class方式にしたい場合） */
+.modal.open {
+  display: flex;
 }

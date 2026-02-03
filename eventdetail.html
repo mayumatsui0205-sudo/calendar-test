@@ -5,10 +5,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>イベント詳細</title>
+
+    <!-- 共通CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/theme.css">
+
+    <!-- テーマ切替 -->
     <script src="js/theme.js" defer></script>
 
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="js/supabaseClient.js" defer></script>
 </head>
 
 <body>
@@ -21,45 +28,102 @@
 
     <main class="container">
         <div class="card">
+
             <h2 id="detailTitle">---</h2>
 
-            <!-- ✅ 一覧モード用 -->
-            <div id="listArea" style="display:none;">
-                <p id="listDate">---</p>
-                <div id="eventList"></div>
-            </div>
+            <p id="detailDate">---</p>
+            <p id="detailCategory">---</p>
 
-            <!-- ✅ 詳細モード用（既存） -->
-            <div id="detailArea" style="display:none;">
-                <p id="detailDate">---</p>
-                <p id="detailCategory">---</p>
-                <p id="detailContent">---</p>
-            </div>
+            <!-- 画像 -->
+            <img id="detailImage" alt="イベント画像" style="display:none;" />
+
+            <p id="detailContent">---</p>
+
         </div>
-
     </main>
 
+    <!-- =========================
+       詳細表示ロジック（DB正）
+  ========================= -->
     <script>
-        const params = new URLSearchParams(location.search);
-        const dateStr = params.get("date"); // YYYY-MM-DD
-        const idx = Number(params.get("idx"));
+        (async () => {
+            // supabaseClient 初期化待ち
+            let supabase = null;
+            for (let i = 0; i < 30; i++) {
+                if (window.supabaseClient) {
+                    supabase = window.supabaseClient;
+                    break;
+                }
+                await new Promise(r => setTimeout(r, 100));
+            }
 
-        const events = JSON.parse(localStorage.getItem("events")) || {};
+            if (!supabase) {
+                document.getElementById("detailTitle").textContent = "DB接続エラー";
+                return;
+            }
 
-        // index側は "2026-2-1" キーなので合わせる
-        const key = `${Number(dateStr.split("-")[0])}-${Number(dateStr.split("-")[1])}-${Number(dateStr.split("-")[2])}`;
-        const list = events[key] || [];
-        const e = list[idx];
+            // URL: eventdetail.html?id=123
+            const params = new URLSearchParams(location.search);
+            const id = params.get("id");
 
-        if (!e) {
-            document.getElementById("detailTitle").textContent = "イベントが見つかりません";
-        } else {
-            document.getElementById("detailTitle").textContent = e.title || "";
-            document.getElementById("detailDate").textContent = `${dateStr} ${e.time || ""}`;
+            if (!id) {
+                document.getElementById("detailTitle").textContent = "イベントIDがありません";
+                return;
+            }
+
+            // DB取得
+            const { data, error } = await supabase
+                .from("EventTable")
+                .select("title, event_date, end_date, category, content, image_path")
+                .eq("id", id)
+                .maybeSingle();
+
+            if (error || !data) {
+                document.getElementById("detailTitle").textContent = "イベントが見つかりません";
+                return;
+            }
+
+            const pad2 = (n) => String(n).padStart(2, "0");
+
+            // 開始時間
+            const start = new Date(data.event_date);
+            const dateStr =
+                `${start.getFullYear()}-${pad2(start.getMonth() + 1)}-${pad2(start.getDate())}`;
+            const startTime =
+                `${pad2(start.getHours())}:${pad2(start.getMinutes())}`;
+
+            // 終了時間（あれば）
+            let timeLabel = startTime;
+            if (data.end_date) {
+                const end = new Date(data.end_date);
+                const endTime =
+                    `${pad2(end.getHours())}:${pad2(end.getMinutes())}`;
+                timeLabel = `${startTime} 〜 ${endTime}`;
+            }
+
+            // 表示反映
+            document.getElementById("detailTitle").textContent = data.title || "";
+            document.getElementById("detailDate").textContent =
+                `${dateStr} ${timeLabel}`;
             document.getElementById("detailCategory").textContent =
-                `タグ：${(e.category && e.category.length) ? e.category.join(" / ") : "-"}`;
-            document.getElementById("detailContent").textContent = e.detail || "";
-        }
+                `タグ：${data.category || "-"}`;
+            document.getElementById("detailContent").textContent =
+                data.content || "";
+
+            // 画像表示
+            if (data.image_path) {
+                const imgEl = document.getElementById("detailImage");
+                const { data: pub } = supabase
+                    .storage
+                    .from("event-images")
+                    .getPublicUrl(data.image_path);
+
+                if (pub?.publicUrl) {
+                    imgEl.src = pub.publicUrl;
+                    imgEl.style.display = "block";
+                }
+            }
+        })();
     </script>
 </body>
 

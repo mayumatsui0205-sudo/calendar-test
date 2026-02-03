@@ -40,7 +40,7 @@
       </div>
 
       <div class="card">
-        <h2>アキバエリア情報</h2>
+        <h2 class="area-title">アキバエリア情報</h2>
         <div>イベント開催中</div>
       </div>
     </section>
@@ -95,6 +95,13 @@
           <button id="eventPopupClose" type="button">閉じる</button>
         </div>
         <div id="eventPopupList"></div>
+        <div id="eventPopupDetail" class="popup-detail" style="display:none;">
+          <h4 id="popupDetailTitle"></h4>
+          <p id="popupDetailTime"></p>
+          <p id="popupDetailCategory"></p>
+          <p id="popupDetailContent"></p>
+        </div>
+
       </div>
     </div>
 
@@ -109,22 +116,8 @@
 
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
+  <script src="js/supabaseClient.js" defer></script>
   <script src="js/theme.js" defer></script>
-
-  <script defer>
-    window.addEventListener("DOMContentLoaded", () => {
-      if (!window.supabase) {
-        console.error("supabase library not loaded");
-        return;
-      }
-      window.supabaseClient = window.supabase.createClient(
-        "https://edkutwxjjrzqhfephiys.supabase.co",
-        "sb_publishable_OTon5bWCuMDV_Lzcdpe-yg_fQL5o4or"
-      );
-    });
-  </script>
-
   <script src="js/script.js" defer></script>
 
 </body>

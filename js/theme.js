@@ -10,6 +10,7 @@
     function applyTimeTheme() {
         if (!document.body) return;
 
+        // 一度すべてのテーマクラスを外す
         const themes = ["morning", "day", "evening", "night"];
         for (let i = 0; i < themes.length; i++) {
             document.body.classList.remove(themes[i]);
