@@ -574,3 +574,9 @@ button:active {
     transition: background 120ms ease, box-shadow 120ms ease;
   }
 }
+
+.date-cell[data-dow="0"] .date-num,
+.date-cell.is-holiday .date-num {
+  color: #ff6b6b;
+  font-weight: 700;
+}

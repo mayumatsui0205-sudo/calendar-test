@@ -1,5 +1,5 @@
 // script.js（index.html カレンダー用：DB正・複数タグドット）
-// ✅ Sunday start / weekend dataset / holiday class（manual set）
+// ✅ Sunday start / weekend dataset / holiday (year-based JSON) with cache
 
 document.addEventListener("DOMContentLoaded", () => {
   const grid = document.getElementById("calendarGrid");
@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let eventsByDate = {};       // "YYYY-M-D" -> [{id,title,time,category}]
   let categoryColorMap = {};   // name -> color
 
+  // Holiday state (year based)
+  let holidaySet = new Set();         // current year holidays (YYYY-MM-DD)
+  const holidayCache = new Map();     // year -> Set
+  let loadedHolidayYear = null;
+
   const pad2 = (n) => String(n).padStart(2, "0");
   const ymd = (y, mIndex, d) => `${y}-${pad2(mIndex + 1)}-${pad2(d)}`;
 
@@ -46,6 +51,38 @@ document.addEventListener("DOMContentLoaded", () => {
       await new Promise((r) => setTimeout(r, step));
     }
     return null;
+  }
+
+  /* =========================
+     Holidays: year JSON loader
+     - expects: /holidays/2026.json
+     - content: ["2026-01-01", "2026-01-12", ...]
+  ========================= */
+  async function loadHolidaySetForYear(year) {
+    // cache hit
+    if (holidayCache.has(year)) return holidayCache.get(year);
+
+    try {
+      const res = await fetch(`holidays/${year}.json`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`holiday json not found: ${year} (status ${res.status})`);
+
+      const arr = await res.json();
+
+      // minimal validation
+      const set = new Set(
+        (Array.isArray(arr) ? arr : [])
+          .filter((s) => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s))
+      );
+
+      holidayCache.set(year, set);
+      return set;
+    } catch (e) {
+      // if not found / invalid: treat as no holidays, but do not break calendar
+      console.warn("loadHolidaySetForYear failed:", e);
+      const empty = new Set();
+      holidayCache.set(year, empty);
+      return empty;
+    }
   }
 
   /* =========================
@@ -223,7 +260,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeStr = `${pad2(dt.getMonth() + 1)}/${pad2(dt.getDate())} ${hhmmFromDate(dt)}`;
     textEl.textContent = `${timeStr} ${e.title}`;
 
-    // 画像（あれば）
     if (!imgEl) return;
     if (!e.image_path) {
       imgEl.style.display = "none";
@@ -245,17 +281,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderCalendar() {
     grid.innerHTML = "";
 
-    // 祝日（手入力・必要に応じて拡張）
-    const HOLIDAYS = new Set([
-      "2026-01-01",
-      "2026-01-12",
-    ]);
-
     const y = current.getFullYear();
     const m = current.getMonth();
     label.textContent = `${y}年 ${m + 1}月`;
 
-    // ✅ Sunday start（0=日）
+    // Sunday start（0=日）
     const start = new Date(y, m, 1).getDay();
     const last = new Date(y, m + 1, 0).getDate();
 
@@ -269,13 +299,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const cell = document.createElement("div");
       cell.className = "date-cell";
 
-      // ✅ weekday data (0=日..6=土)
+      // weekday data (0=日..6=土)
       const dow = new Date(y, m, d).getDay();
       cell.dataset.dow = dow;
 
-      // ✅ holiday class
+      // holiday class (YYYY-MM-DD)
       const keyYmd = ymd(y, m, d);
-      if (HOLIDAYS.has(keyYmd)) cell.classList.add("is-holiday");
+      if (holidaySet.has(keyYmd)) cell.classList.add("is-holiday");
 
       const num = document.createElement("div");
       num.className = "date-num";
@@ -332,6 +362,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!supabase) {
       console.error("supabaseClient not found (timeout)");
       return;
+    }
+
+    // load holidays for current year (only when year changes)
+    const y = current.getFullYear();
+    if (loadedHolidayYear !== y) {
+      holidaySet = await loadHolidaySetForYear(y);
+      loadedHolidayYear = y;
     }
 
     await loadCategoryColors(supabase);
