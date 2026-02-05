@@ -541,3 +541,36 @@ button:active {
     /* 既存9pxから1段だけ */
   }
 }
+
+/* =========================
+   Calendar: weekend / holiday
+========================= */
+
+/* 日曜 */
+.date-cell[data-dow="0"] .date-num {
+  color: #ff6b6b;
+  /* 赤系：テーマ非依存 */
+}
+
+/* 土曜 */
+.date-cell[data-dow="6"] .date-num {
+  color: #4dabf7;
+  /* 青系 */
+}
+
+/* 祝日（曜日より優先） */
+.date-cell.is-holiday .date-num {
+  color: #ff6b6b;
+  font-weight: 700;
+}
+
+/* =========================
+   Calendar: hover (PC only)
+========================= */
+@media (hover: hover) and (pointer: fine) {
+  .date-cell:hover {
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 0 2px var(--ui-0);
+    transition: background 120ms ease, box-shadow 120ms ease;
+  }
+}

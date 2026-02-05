@@ -1,4 +1,5 @@
 // script.js（index.html カレンダー用：DB正・複数タグドット）
+// ✅ Sunday start / weekend dataset / holiday class（manual set）
 
 document.addEventListener("DOMContentLoaded", () => {
   const grid = document.getElementById("calendarGrid");
@@ -52,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ========================= */
   function categoriesFromString(categoryStr) {
     return (categoryStr || "")
-      .split(/[,\u3001]/)   // , と 、 の両対応
+      .split(/[,\u3001]/) // , と 、 の両対応
       .map((s) => s.trim())
       .filter(Boolean);
   }
@@ -104,7 +105,9 @@ document.addEventListener("DOMContentLoaded", () => {
     popupTitle.textContent = `${dateStr} のイベント`;
     popupList.innerHTML = "";
 
-    const sorted = [...dayEvents].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+    const sorted = [...dayEvents].sort((a, b) =>
+      (a.time || "").localeCompare(b.time || "")
+    );
 
     sorted.forEach((ev) => {
       const item = document.createElement("div");
@@ -191,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function renderNextEventFromDB(supabase) {
     const textEl = document.getElementById("nextEventText");
     const imgEl = document.getElementById("nextEventImage");
-    if (!textEl) return; // HTMLに無ければ何もしない
+    if (!textEl) return;
 
     const nowIso = new Date().toISOString();
     const { data, error } = await supabase
@@ -221,18 +224,18 @@ document.addEventListener("DOMContentLoaded", () => {
     textEl.textContent = `${timeStr} ${e.title}`;
 
     // 画像（あれば）
-    if (imgEl) {
-      if (e.image_path) {
-        const { data: pub } = supabase.storage.from("event-images").getPublicUrl(e.image_path);
-        if (pub?.publicUrl) {
-          imgEl.src = pub.publicUrl;
-          imgEl.style.display = "block";
-        } else {
-          imgEl.style.display = "none";
-        }
-      } else {
-        imgEl.style.display = "none";
-      }
+    if (!imgEl) return;
+    if (!e.image_path) {
+      imgEl.style.display = "none";
+      return;
+    }
+
+    const { data: pub } = supabase.storage.from("event-images").getPublicUrl(e.image_path);
+    if (pub?.publicUrl) {
+      imgEl.src = pub.publicUrl;
+      imgEl.style.display = "block";
+    } else {
+      imgEl.style.display = "none";
     }
   }
 
@@ -242,12 +245,18 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderCalendar() {
     grid.innerHTML = "";
 
+    // 祝日（手入力・必要に応じて拡張）
+    const HOLIDAYS = new Set([
+      "2026-01-01",
+      "2026-01-12",
+    ]);
+
     const y = current.getFullYear();
     const m = current.getMonth();
     label.textContent = `${y}年 ${m + 1}月`;
 
-    // Monday start
-    const start = (new Date(y, m, 1).getDay() + 6) % 7;
+    // ✅ Sunday start（0=日）
+    const start = new Date(y, m, 1).getDay();
     const last = new Date(y, m + 1, 0).getDate();
 
     for (let i = 0; i < start; i++) {
@@ -259,6 +268,14 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let d = 1; d <= last; d++) {
       const cell = document.createElement("div");
       cell.className = "date-cell";
+
+      // ✅ weekday data (0=日..6=土)
+      const dow = new Date(y, m, d).getDay();
+      cell.dataset.dow = dow;
+
+      // ✅ holiday class
+      const keyYmd = ymd(y, m, d);
+      if (HOLIDAYS.has(keyYmd)) cell.classList.add("is-holiday");
 
       const num = document.createElement("div");
       num.className = "date-num";
